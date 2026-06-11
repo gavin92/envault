@@ -1,0 +1,48 @@
+{
+  "name": "envault",
+  "version": "0.1.0",
+  "description": "Zero-dependency environment variable validator with full TypeScript inference",
+  "keywords": [
+    "env",
+    "environment",
+    "validation",
+    "typescript",
+    "dotenv",
+    "config",
+    "zero-dependency"
+  ],
+  "homepage": "https://github.com/gavin92/envault#readme",
+  "bugs": {
+    "url": "https://github.com/gavin92/envault/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gavin92/envault.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "tsx tests/check.test.ts",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0"
+  }
+}
