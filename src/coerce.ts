@@ -1,5 +1,10 @@
 import type { FieldDef, ValidationError } from './types.js'
 
+function makeError(key: string, message: string, value?: string): ValidationError {
+  if (value !== undefined) return { key, message, value }
+  return { key, message }
+}
+
 export function coerceAndValidate(
   key: string,
   raw: string | undefined,
@@ -13,7 +18,7 @@ export function coerceAndValidate(
       return { value: field.default }
     }
     if ('required' in field && field.required === true) {
-      return { error: { key, message: `Missing required variable "${key}"` } }
+      return { error: makeError(key, `Missing required variable "${key}"`) }
     }
     return { value: undefined }
   }
@@ -23,11 +28,11 @@ export function coerceAndValidate(
     case 'string': {
       if (field.pattern && !field.pattern.test(raw)) {
         return {
-          error: {
+          error: makeError(
             key,
-            message: `"${key}" does not match pattern ${field.pattern}`,
-            value: isSecret ? undefined : raw,
-          },
+            `"${key}" does not match pattern ${field.pattern}`,
+            isSecret ? undefined : raw,
+          ),
         }
       }
       return { value: raw }
@@ -37,18 +42,18 @@ export function coerceAndValidate(
       const n = Number(raw)
       if (Number.isNaN(n)) {
         return {
-          error: {
+          error: makeError(
             key,
-            message: `"${key}" must be a number (got "${isSecret ? '***' : raw}")`,
-            value: isSecret ? undefined : raw,
-          },
+            `"${key}" must be a number (got "${isSecret ? '***' : raw}")`,
+            isSecret ? undefined : raw,
+          ),
         }
       }
       if (field.min !== undefined && n < field.min) {
-        return { error: { key, message: `"${key}" must be ≥ ${field.min} (got ${n})` } }
+        return { error: makeError(key, `"${key}" must be ≥ ${field.min} (got ${n})`) }
       }
       if (field.max !== undefined && n > field.max) {
-        return { error: { key, message: `"${key}" must be ≤ ${field.max} (got ${n})` } }
+        return { error: makeError(key, `"${key}" must be ≤ ${field.max} (got ${n})`) }
       }
       return { value: n }
     }
@@ -58,11 +63,11 @@ export function coerceAndValidate(
       if (['true', '1', 'yes', 'on'].includes(lower)) return { value: true }
       if (['false', '0', 'no', 'off'].includes(lower)) return { value: false }
       return {
-        error: {
+        error: makeError(
           key,
-          message: `"${key}" must be a boolean (true/false/1/0/yes/no/on/off, got "${raw}")`,
-          value: raw,
-        },
+          `"${key}" must be a boolean (true/false/1/0/yes/no/on/off, got "${raw}")`,
+          raw,
+        ),
       }
     }
 
@@ -72,11 +77,11 @@ export function coerceAndValidate(
         return { value: raw }
       } catch {
         return {
-          error: {
+          error: makeError(
             key,
-            message: `"${key}" must be a valid URL (got "${isSecret ? '***' : raw}")`,
-            value: isSecret ? undefined : raw,
-          },
+            `"${key}" must be a valid URL (got "${isSecret ? '***' : raw}")`,
+            isSecret ? undefined : raw,
+          ),
         }
       }
     }
@@ -84,11 +89,11 @@ export function coerceAndValidate(
     case 'enum': {
       if (!field.values.includes(raw)) {
         return {
-          error: {
+          error: makeError(
             key,
-            message: `"${key}" must be one of [${field.values.join(', ')}] (got "${raw}")`,
-            value: raw,
-          },
+            `"${key}" must be one of [${field.values.join(', ')}] (got "${raw}")`,
+            raw,
+          ),
         }
       }
       return { value: raw }
@@ -99,11 +104,11 @@ export function coerceAndValidate(
         return { value: JSON.parse(raw) }
       } catch {
         return {
-          error: {
+          error: makeError(
             key,
-            message: `"${key}" must be valid JSON`,
-            value: isSecret ? undefined : raw,
-          },
+            `"${key}" must be valid JSON`,
+            isSecret ? undefined : raw,
+          ),
         }
       }
     }
