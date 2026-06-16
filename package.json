@@ -1,5 +1,5 @@
 {
-  "name": "envault",
+  "name": "@gavin92/envault",
   "version": "0.1.0",
   "description": "Zero-dependency environment variable validator with full TypeScript inference",
   "keywords": [
