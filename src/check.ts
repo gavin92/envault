@@ -4,7 +4,7 @@ import type {
   CheckOptions,
   ValidationError,
   FieldDef,
-} from "../src/types.js";
+} from "./types.js";
 import { coerceAndValidate } from "./coerce.js";
 
 export function check<S extends Schema>(
@@ -12,7 +12,10 @@ export function check<S extends Schema>(
   options: CheckOptions = {},
 ): Env<S> {
   const source =
-    options.env ?? (typeof process !== "undefined" ? process.env : {});
+    options.env ??
+    (globalThis as { process?: { env: Record<string, string | undefined> } })
+      .process?.env ??
+    {};
   const errors: ValidationError[] = [];
   const result: Record<string, unknown> = {};
 

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2026-06-11
 
 ### Added
+
 - Initial release
 - `check()` — validates and coerces environment variables from a typed schema
 - Field types: `string`, `number`, `boolean`, `url`, `enum`, `json`

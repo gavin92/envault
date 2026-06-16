@@ -3,6 +3,8 @@ import { generateExample } from "../src/generate.js";
 
 // ─── check() tests ────────────────────────────────────────────────────────────
 
+let failed = false;
+
 function test(name: string, fn: () => void) {
   try {
     fn();
@@ -10,7 +12,7 @@ function test(name: string, fn: () => void) {
   } catch (e) {
     console.error(`  ✗ ${name}`);
     console.error(`    ${(e as Error).message}`);
-    process.exitCode = 1;
+    failed = true;
   }
 }
 
@@ -237,3 +239,4 @@ test("includes description as comment", () => {
 });
 
 console.log();
+if (failed) throw new Error("Some tests failed");

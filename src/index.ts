@@ -1,5 +1,5 @@
-export { check } from './check.js'
-export { generateExample } from './generate.js'
+export { check } from "./check.js";
+export { generateExample } from "./generate.js";
 export type {
   Schema,
   FieldDef,
@@ -12,4 +12,4 @@ export type {
   Env,
   CheckOptions,
   ValidationError,
-} from './types.js'
+} from "./types.js";
