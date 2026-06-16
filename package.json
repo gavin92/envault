@@ -1,5 +1,5 @@
 {
-  "name": "@gavin92/envault",
+  "name": "@gavincettolo/envault",
   "version": "0.1.0",
   "description": "Zero-dependency environment variable validator with full TypeScript inference",
   "keywords": [
@@ -11,13 +11,13 @@
     "config",
     "zero-dependency"
   ],
-  "homepage": "https://github.com/gavin92/envault#readme",
+  "homepage": "https://github.com/gavincettolo/envault#readme",
   "bugs": {
-    "url": "https://github.com/gavin92/envault/issues"
+    "url": "https://github.com/gavincettolo/envault/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gavin92/envault.git"
+    "url": "git+https://github.com/gavincettolo/envault.git"
   },
   "license": "MIT",
   "type": "module",

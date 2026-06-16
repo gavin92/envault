@@ -11,7 +11,7 @@ Thank you for your interest in contributing! This is a focused, zero-dependency 
 ## Getting started
 
 ```bash
-git clone https://github.com/gavin92/envault
+git clone https://github.com/gavincettolo/envault
 cd envault
 npm install
 npm test
