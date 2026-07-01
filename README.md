@@ -129,6 +129,43 @@ const env = check({
 })
 ```
 
+### Array — comma-separated lists
+
+```ts
+const env = check({
+  ALLOWED_ORIGINS: { type: 'array', required: true },
+  // custom delimiter
+  TAGS: { type: 'array', default: [], delimiter: '|' },
+})
+
+// ALLOWED_ORIGINS=a.com, b.com, c.com → ['a.com', 'b.com', 'c.com']
+```
+
+### Per-environment required fields
+
+Use `requiredIn` to only enforce a field in specific environments — handy when a variable is mandatory in production but optional locally:
+
+```ts
+const env = check(
+  { DATABASE_URL: { type: 'url', requiredIn: ['production', 'staging'] } },
+  { environment: process.env.NODE_ENV },
+)
+```
+
+### Custom validation
+
+Every field type accepts a `validate` function for checks the built-in options don't cover. Return `true` to pass, or a string to fail with that message:
+
+```ts
+const env = check({
+  PORT: {
+    type: 'number',
+    required: true,
+    validate: (n) => (n > 1024 ? true : 'must be a non-privileged port'),
+  },
+})
+```
+
 ### Secret masking
 
 Mark sensitive variables with `secret: true`. Their values will never appear in error messages or generated `.env.example` files:
@@ -224,6 +261,9 @@ Additional options per type:
 | `url`     | `secret`                                            | `string`                       |
 | `enum`    | `values: readonly string[]` — use `as const`        | union of the provided values   |
 | `json`    | —                                                   | `unknown`                      |
+| `array`   | `secret`, `delimiter: string` (default `,`)         | `string[]`                     |
+
+Every field also accepts `requiredIn: string[]` (require only in matching `options.environment`) and `validate: (value) => true | string` (custom validation).
 
 **Boolean coercion** accepts: `true / false`, `1 / 0`, `yes / no`, `on / off` (case-insensitive).
 

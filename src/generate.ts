@@ -17,6 +17,8 @@ function placeholderFor(key: string, field: FieldDef): string {
       return field.values[0] ?? "";
     case "json":
       return "{}";
+    case "array":
+      return "";
   }
 }
 
@@ -27,11 +29,17 @@ function commentFor(field: FieldDef): string[] {
   }
   const meta: string[] = [];
   if ("required" in field && field.required) meta.push("required");
+  if ("requiredIn" in field && field.requiredIn?.length) {
+    meta.push(`required in: ${field.requiredIn.join(" | ")}`);
+  }
   if ("secret" in field && field.secret) meta.push("secret");
   if ("type" in field) meta.push(`type: ${field.type}`);
   if ("values" in field) meta.push(`values: ${field.values.join(" | ")}`);
   if ("min" in field && field.min !== undefined) meta.push(`min: ${field.min}`);
   if ("max" in field && field.max !== undefined) meta.push(`max: ${field.max}`);
+  if ("delimiter" in field && field.delimiter) {
+    meta.push(`delimiter: "${field.delimiter}"`);
+  }
   if (meta.length) lines.push(`# ${meta.join(", ")}`);
   return lines;
 }

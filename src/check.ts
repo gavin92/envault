@@ -23,7 +23,7 @@ export function check<S extends Schema>(
     const field = schema[key] as FieldDef;
     const raw = source[key];
 
-    const outcome = coerceAndValidate(key, raw, field);
+    const outcome = coerceAndValidate(key, raw, field, options.environment);
 
     if ("error" in outcome) {
       errors.push(outcome.error);

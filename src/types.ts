@@ -1,51 +1,59 @@
 // ─── Field descriptors ────────────────────────────────────────────────────────
 
-export type StringField = {
-  type: "string";
+/** Options shared by every field type. */
+interface BaseField<T> {
   required?: boolean;
+  /** Only require this field when `options.environment` matches one of these. */
+  requiredIn?: readonly string[];
+  description?: string;
+  /** Custom validation. Return `true` to pass, or a string error message to fail. */
+  validate?: (value: T) => true | string;
+}
+
+export type StringField = BaseField<string> & {
+  type: "string";
   default?: string;
   secret?: boolean;
   pattern?: RegExp;
-  description?: string;
 };
 
-export type NumberField = {
+export type NumberField = BaseField<number> & {
   type: "number";
-  required?: boolean;
   default?: number;
   min?: number;
   max?: number;
-  description?: string;
+  secret?: boolean;
 };
 
-export type BooleanField = {
+export type BooleanField = BaseField<boolean> & {
   type: "boolean";
-  required?: boolean;
   default?: boolean;
-  description?: string;
 };
 
-export type UrlField = {
+export type UrlField = BaseField<string> & {
   type: "url";
-  required?: boolean;
   default?: string;
   secret?: boolean;
-  description?: string;
 };
 
-export type EnumField = {
+export type EnumField = BaseField<string> & {
   type: "enum";
   values: readonly string[];
-  required?: boolean;
   default?: string;
-  description?: string;
 };
 
-export type JsonField = {
+export type JsonField = BaseField<unknown> & {
   type: "json";
-  required?: boolean;
   default?: unknown;
-  description?: string;
+  secret?: boolean;
+};
+
+export type ArrayField = BaseField<string[]> & {
+  type: "array";
+  default?: string[];
+  /** Delimiter used to split the raw string. Defaults to ",". */
+  delimiter?: string;
+  secret?: boolean;
 };
 
 export type FieldDef =
@@ -54,7 +62,8 @@ export type FieldDef =
   | BooleanField
   | UrlField
   | EnumField
-  | JsonField;
+  | JsonField
+  | ArrayField;
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -72,11 +81,13 @@ type InferType<F extends FieldDef> = F["type"] extends "string"
         ? string
         : F["type"] extends "json"
           ? unknown
-          : F extends { type: "enum"; values: infer V }
-            ? V extends readonly string[]
-              ? V[number]
-              : string
-            : never;
+          : F["type"] extends "array"
+            ? string[]
+            : F extends { type: "enum"; values: infer V }
+              ? V extends readonly string[]
+                ? V[number]
+                : string
+              : never;
 
 type IsRequired<F extends FieldDef> = F extends { required: true }
   ? true
@@ -96,7 +107,7 @@ export type Env<S extends Schema> = {
 export interface CheckOptions {
   /** Override the environment source. Defaults to process.env. */
   env?: Record<string, string | undefined>;
-  /** Current environment name (e.g. 'production'). Used for per-env required rules. */
+  /** Current environment name (e.g. 'production'). Matched against each field's `requiredIn`. */
   environment?: string;
   /** Custom error handler. Must throw or return never. */
   onError?: (errors: ValidationError[]) => never;

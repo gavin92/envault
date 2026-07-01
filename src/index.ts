@@ -9,6 +9,7 @@ export type {
   UrlField,
   EnumField,
   JsonField,
+  ArrayField,
   Env,
   CheckOptions,
   ValidationError,

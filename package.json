@@ -1,6 +1,6 @@
 {
   "name": "@gavincettolo/envault",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zero-dependency environment variable validator with full TypeScript inference",
   "keywords": [
     "env",
@@ -21,6 +21,10 @@
   },
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

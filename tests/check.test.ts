@@ -207,6 +207,82 @@ test("validates string pattern", () => {
   assert(threw, "expected error for pattern mismatch");
 });
 
+test("requiredIn throws when environment matches", () => {
+  let threw = false;
+  try {
+    check(
+      { DATABASE_URL: { type: "string", requiredIn: ["production"] } },
+      { env: {}, environment: "production" },
+    );
+  } catch {
+    threw = true;
+  }
+  assert(threw, "expected error when environment matches requiredIn");
+});
+
+test("requiredIn does not throw when environment doesn't match", () => {
+  const env = check(
+    { DATABASE_URL: { type: "string", requiredIn: ["production"] } },
+    { env: {}, environment: "development" },
+  );
+  assert(env.DATABASE_URL === undefined, "expected undefined outside requiredIn");
+});
+
+test("custom validate hook rejects value", () => {
+  let message = "";
+  try {
+    check(
+      {
+        PORT: {
+          type: "number",
+          required: true,
+          validate: (n) => (n % 2 === 0 ? true : "must be even"),
+        },
+      },
+      { env: { PORT: "3001" } },
+    );
+  } catch (e) {
+    message = (e as Error).message;
+  }
+  assert(message.includes("must be even"), "expected custom validate error");
+});
+
+test("custom validate hook accepts value", () => {
+  const env = check(
+    {
+      PORT: {
+        type: "number",
+        required: true,
+        validate: (n) => (n % 2 === 0 ? true : "must be even"),
+      },
+    },
+    { env: { PORT: "3002" } },
+  );
+  assert(env.PORT === 3002, "expected value to pass through validate");
+});
+
+test("coerces array with default delimiter", () => {
+  const env = check(
+    { ORIGINS: { type: "array", required: true } },
+    { env: { ORIGINS: "a.com, b.com,c.com" } },
+  );
+  assert(
+    JSON.stringify(env.ORIGINS) === JSON.stringify(["a.com", "b.com", "c.com"]),
+    `expected trimmed array, got ${JSON.stringify(env.ORIGINS)}`,
+  );
+});
+
+test("coerces array with custom delimiter", () => {
+  const env = check(
+    { ORIGINS: { type: "array", required: true, delimiter: "|" } },
+    { env: { ORIGINS: "a.com|b.com" } },
+  );
+  assert(
+    JSON.stringify(env.ORIGINS) === JSON.stringify(["a.com", "b.com"]),
+    `expected pipe-delimited array, got ${JSON.stringify(env.ORIGINS)}`,
+  );
+});
+
 // ─── generateExample() tests ──────────────────────────────────────────────────
 
 console.log("\ngenerateExample()");
